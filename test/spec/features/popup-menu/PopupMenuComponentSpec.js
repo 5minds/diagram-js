@@ -17,6 +17,8 @@ import {
   queryAll as domQueryAll
 } from 'min-dom';
 
+import searchFn from 'lib/features/search/search';
+
 
 const TEST_IMAGE_URL = `data:image/svg+xml;utf8,${
   encodeURIComponent(`
@@ -45,7 +47,7 @@ insertCSS('fake-font.css', `
 
 describe('features/popup-menu - <PopupMenu>', function() {
 
-  let container, teardown;
+  let container, cleanup;
 
   beforeEach(function() {
     container = domify('<div class="djs-parent"></div>');
@@ -56,7 +58,7 @@ describe('features/popup-menu - <PopupMenu>', function() {
   afterEach(function() {
     container.parentNode.removeChild(container);
 
-    teardown && teardown();
+    cleanup && cleanup();
   });
 
 
@@ -86,7 +88,7 @@ describe('features/popup-menu - <PopupMenu>', function() {
     await createPopupMenu({ container, onClosed });
 
     // when
-    teardown();
+    cleanup();
 
     // then
     expect(onClosed).to.have.been.calledOnce;
@@ -739,6 +741,7 @@ describe('features/popup-menu - <PopupMenu>', function() {
     const props = {
       entries: [],
       headerEntries: [],
+      searchFn,
       position() {
         return { x: 0, y: 0 };
       },
@@ -748,10 +751,10 @@ describe('features/popup-menu - <PopupMenu>', function() {
       ...restOptions
     };
 
-    teardown = () => {
+    cleanup = () => {
       render(null, container);
 
-      teardown = null;
+      cleanup = null;
     };
 
     const result = render(

@@ -6,6 +6,84 @@ All notable changes to [diagram-js](https://github.com/bpmn-io/diagram-js) are d
 
 _**Note:** Yet to be released changes appear here._
 
+## 15.2.4
+
+* `FIX`: canvas `autoFocus` must explicitly be enabled ([#956](https://github.com/bpmn-io/diagram-js/pull/956))
+* `FIX`: properly integrate `zoomscroll` with canvas focus ([#956](https://github.com/bpmn-io/diagram-js/pull/956))
+* `FIX`: properly integrate `movecanvas` with canvas focus ([#956](https://github.com/bpmn-io/diagram-js/pull/956))
+
+## 15.2.3
+
+* `FIX`: adjust search to prioritize start of word and exact matches ([#953](https://github.com/bpmn-io/diagram-js/pull/953))
+* `FIX`: ignore whitespace when searching ([#954](https://github.com/bpmn-io/diagram-js/pull/954))
+
+## 15.2.2
+
+* `FIX`: correct `Keyboard#bind` and config types ([#948](https://github.com/bpmn-io/diagram-js/pull/948))
+
+## 15.2.1
+
+* `FIX`: limit overly permissive regex ([#949](https://github.com/bpmn-io/diagram-js/pull/949))
+
+## 15.2.0
+
+* `FIX`: clear selection when opening search pad ([#947](https://github.com/bpmn-io/diagram-js/pull/947))
+* `FIX`: correct dangling selection after search pad interaction ([#947](https://github.com/bpmn-io/diagram-js/pull/947))
+* `CHORE`: simplify search pad pre-selection behavior ([#947](https://github.com/bpmn-io/diagram-js/pull/947))
+
+## 15.1.0
+
+* `FEAT`: integrate `popup-menu` with `search` ([#932](https://github.com/bpmn-io/diagram-js/pull/932))
+* `FEAT`: recognize modern `search` tokens in `search-pad` ([#932](https://github.com/bpmn-io/diagram-js/pull/932))
+* `FEAT`: improve `search` types ([#932](https://github.com/bpmn-io/diagram-js/pull/932))
+* `FIX`: correctly handle duplicate entries and whitespace in `search` ([#932](https://github.com/bpmn-io/diagram-js/pull/932))
+* `FIX`: find `search` terms across all keys ([#932](https://github.com/bpmn-io/diagram-js/pull/932))
+* `FIX`: `search` always returns tokens for matched items ([#932](https://github.com/bpmn-io/diagram-js/pull/932))
+
+## 15.0.0
+
+* `FEAT`: make canvas browser selectable ([#659](https://github.com/bpmn-io/diagram-js/pull/659))
+* `FEAT`: make keyboard binding implicit ([#661](https://github.com/bpmn-io/diagram-js/issues/661))
+* `FEAT`: make multi-selection outline an outline concern ([#944](https://github.com/bpmn-io/diagram-js/issues/944))
+
+### Breaking Changes
+
+* `Keyboard` binding target can no longer be chosen. Configure keyboard binding via the `keyboard.bind` configuration and rely on keybindings to work if the canvas has browser focus. ([#661](https://github.com/bpmn-io/diagram-js/issues/661))
+* The `Canvas` is now a focusable component, that is recognized accordingly by the browser, with all benefits for UX and interaction. Components that pull focus from the `Canvas` during modeling must ensure to restore the focus (if intended), via `Canvas#restoreFocus`. ([#661](https://github.com/bpmn-io/diagram-js/issues/661))
+* The `selection` feature does not provide visual outline by default anymore. Use the `outline` feature to re-enable it. ([#944](https://github.com/bpmn-io/diagram-js/issues/944))
+
+## 14.11.3
+
+* `CHORE`: simplify viewbox cloning ([#935](https://github.com/bpmn-io/diagram-js/pull/935))
+
+## 14.11.2
+
+* `FIX`: restore search result highlight ([#931](https://github.com/bpmn-io/diagram-js/pull/931))
+* `FIX`: correct search result highlight not being removed ([#931](https://github.com/bpmn-io/diagram-js/pull/931))
+* `FIX`: do not change zoom when search openes ([#931](https://github.com/bpmn-io/diagram-js/pull/931))
+
+## 14.11.1
+
+_Partially reverts v14.11.0._
+
+* `FIX`: revert `search` integration into popup menu
+
+## 14.11.0
+
+* `FEAT`: add `search` utility
+* `FEAT`: sort popup entry search results semantically ([#916](https://github.com/bpmn-io/diagram-js/pull/916))
+
+## 14.10.0
+
+* `FEAT`: align search styling with other popups ([#913](https://github.com/bpmn-io/diagram-js/pull/913))
+* `CHORE`: use existing outline in search ([#913](https://github.com/bpmn-io/diagram-js/pull/913))
+* `FIX`: only commit search viewport changes on `ENTER` ([#913](https://github.com/bpmn-io/diagram-js/pull/913))
+
+## 14.9.0
+
+* `CHORE`: export types compatible with `verbatimModuleSyntax` ([#927](https://github.com/bpmn-io/diagram-js/pull/927), [#864](https://github.com/bpmn-io/diagram-js/issues/864))
+* `CHORE`: re-compute context pad position next frame ([#920](https://github.com/bpmn-io/diagram-js/pull/920))
+
 ## 14.8.0
 
 * `FEAT`: add `scheduler` service ([#915](https://github.com/bpmn-io/diagram-js/pull/915))
@@ -137,7 +215,7 @@ _**Note:** Yet to be released changes appear here._
 ## 12.8.1
 
 * `FIX`: reposition popup menu if it opens above the viewport ([#829](https://github.com/bpmn-io/diagram-js/pull/829))
- 
+
 ## 12.8.0
 
 * `FEAT`: remove selection outline from connections ([#826](https://github.com/bpmn-io/diagram-js/pull/826))

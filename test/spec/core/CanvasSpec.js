@@ -20,7 +20,7 @@ import {
 import { getChildren as getChildrenGfx } from 'lib/util/GraphicsUtil';
 
 
-describe('Canvas', function() {
+describe('core/Canvas', function() {
 
   var container;
 
@@ -47,12 +47,18 @@ describe('Canvas', function() {
 
     beforeEach(createDiagram());
 
+
     it('should create <svg> element', inject(function() {
 
-      // then
+      // when
       var svg = container.querySelector('svg');
 
-      expect(svg).not.to.be.null;
+      // then
+      // svg is created
+      expect(svg).to.exist;
+
+      // and user selectable
+      expect(svgAttr(svg, 'tabindex')).to.equal('0');
     }));
 
 
@@ -68,11 +74,160 @@ describe('Canvas', function() {
   });
 
 
+  describe('focus handling', function() {
+
+    beforeEach(function() {
+      container = TestContainer.get(this);
+    });
+
+    beforeEach(createDiagram());
+
+
+    it('should be focusable', function() {
+
+      // given
+      var svg = container.querySelector('svg');
+
+      // when
+      svg.focus();
+
+      // then
+      expect(document.activeElement).to.equal(svg);
+    });
+
+
+    it('should focus on <element.mousedown>', inject(function(canvas, eventBus) {
+
+      // given
+      var svg = container.querySelector('svg');
+
+      // when
+      eventBus.fire('element.mousedown',{
+        element: canvas.getRootElement(),
+        gfx: svg
+      });
+
+      // then
+      expect(document.activeElement).to.equal(svg);
+    }));
+
+
+    describe('<hover>', function() {
+
+      /**
+       * @type { HTMLElement }
+       */
+      let inputEl;
+
+      beforeEach(function() {
+        document.body.focus();
+      });
+
+      afterEach(function() {
+        inputEl && inputEl.remove();
+      });
+
+
+      it('should NOT focus if body is focused', inject(function(canvas, eventBus) {
+
+        // given
+        var svg = container.querySelector('svg');
+
+        // when
+        eventBus.fire('element.hover', {
+          element: canvas.getRootElement(),
+          gfx: svg
+        });
+
+        // then
+        expect(document.activeElement).to.not.equal(svg);
+      }));
+
+
+      it('should not scroll on focus', inject(function(canvas, eventBus) {
+
+        // given
+        var svg = container.querySelector('svg');
+
+        var clientRect = svg.getBoundingClientRect();
+
+        // when
+        eventBus.fire('element.hover', {
+          element: canvas.getRootElement(),
+          gfx: svg
+        });
+
+        // then
+        expect(clientRect).to.eql(svg.getBoundingClientRect());
+      }));
+
+
+      it('should not focus on existing document focus', inject(function(canvas, eventBus) {
+
+        // given
+        inputEl = document.createElement('input');
+
+        document.body.appendChild(inputEl);
+        inputEl.focus();
+
+        // assume
+        expect(document.activeElement).to.equal(inputEl);
+
+        var svg = container.querySelector('svg');
+
+        // when
+        eventBus.fire('element.hover', {
+          element: canvas.getRootElement(),
+          gfx: svg
+        });
+
+        // then
+        expect(document.activeElement).to.eql(inputEl);
+      }));
+
+    });
+
+  });
+
+
+  describe('focus handling <config.autoFocus>', function() {
+
+    beforeEach(function() {
+      container = TestContainer.get(this);
+    });
+
+    beforeEach(createDiagram({
+      canvas: {
+        autoFocus: true
+      }
+    }));
+
+
+    it('should focus if body is focused', inject(function(canvas, eventBus) {
+
+      // given
+      var svg = container.querySelector('svg');
+
+      // when
+      eventBus.fire('element.hover', {
+        element: canvas.getRootElement(),
+        gfx: svg
+      });
+
+      // then
+      expect(document.activeElement).to.equal(svg);
+    }));
+
+  });
+
+
   describe('events', function() {
 
     beforeEach(function() {
       container = TestContainer.get(this);
     });
+
+    beforeEach(createDiagram());
 
 
     it('should fire "canvas.resized" event', inject(function(eventBus, canvas) {
@@ -94,7 +249,7 @@ describe('Canvas', function() {
   });
 
 
-  describe('destroy', function() {
+  describe('#destroy', function() {
 
     beforeEach(function() {
       container = TestContainer.get(this);
@@ -115,7 +270,7 @@ describe('Canvas', function() {
   });
 
 
-  describe('clear', function() {
+  describe('#clear', function() {
 
     beforeEach(createDiagram());
 
@@ -158,6 +313,47 @@ describe('Canvas', function() {
       expect(canvas._planes).to.be.empty;
       expect(canvas._layers).to.be.empty;
       expect(canvas._rootElement).not.to.exist;
+    }));
+
+  });
+
+
+  describe('#focus', function() {
+
+    beforeEach(function() {
+      container = TestContainer.get(this);
+    });
+
+    beforeEach(createDiagram());
+
+
+    it('should emit <canvas.focus.changed> event', inject(function(canvas, eventBus) {
+
+      // assume
+      expect(canvas.isFocused()).to.be.false;
+
+      // when
+      const focusSpy = sinon.spy(function(event) {
+        expect(event.focused).to.be.true;
+      });
+
+      eventBus.once('canvas.focus.changed', focusSpy);
+
+      canvas.focus();
+
+      // then
+      expect(focusSpy).to.have.been.calledOnce;
+
+      // and when
+      const refocusSpy = sinon.spy();
+
+      eventBus.once('canvas.focus.changed', refocusSpy);
+
+      canvas.focus();
+
+      // then
+      // focus is not triggered again
+      expect(refocusSpy).not.to.have.been.called;
     }));
 
   });
@@ -398,6 +594,7 @@ describe('Canvas', function() {
     beforeEach(function() {
       container = TestContainer.get(this);
     });
+
     beforeEach(createDiagram());
 
 
@@ -867,6 +1064,16 @@ describe('Canvas', function() {
       }));
 
 
+      it('should return copy of viewbox', inject(function(canvas) {
+
+        // when
+        var viewbox = canvas.viewbox();
+
+        // then
+        expect(viewbox).to.not.equal(canvas.viewbox());
+      }));
+
+
       it('should provide default viewbox / overflowing diagram', inject(function(canvas) {
 
         // given
@@ -1317,6 +1524,7 @@ describe('Canvas', function() {
     beforeEach(function() {
       container = TestContainer.get(this);
     });
+
     beforeEach(createDiagram({ canvas: { width: 500, height: 500 } }));
 
 
@@ -1845,7 +2053,7 @@ describe('Canvas', function() {
       }));
 
 
-      it('should remove cached viewbox on shape add', inject(
+      it('should remove cached viewbox on shape change', inject(
         function(canvas, eventBus, graphicsFactory) {
           var shape = canvas.addShape({
             id: 's0',
@@ -2058,6 +2266,7 @@ describe('Canvas', function() {
     beforeEach(function() {
       container = TestContainer.get(this);
     });
+
     beforeEach(createDiagram({ canvas: { width: 300, height: 300 } }));
 
 
@@ -2107,7 +2316,7 @@ describe('Canvas', function() {
     }));
 
 
-    it('should return abs position (zoomed in)', inject(function(canvas) {
+    it('should return abs position (zoomed out)', inject(function(canvas) {
 
       // given
       var shape = { id: 's0', x: 10, y: 20, width: 300, height: 200 };
@@ -2130,6 +2339,7 @@ describe('Canvas', function() {
     beforeEach(function() {
       container = TestContainer.get(this);
     });
+
     beforeEach(createDiagram({ canvas: { width: 300, height: 300 } }));
 
     var shape;
@@ -2175,6 +2385,7 @@ describe('Canvas', function() {
     beforeEach(function() {
       container = TestContainer.get(this);
     });
+
     beforeEach(createDiagram({ canvas: { width: 300, height: 300 } }));
 
 
@@ -2637,3 +2848,4 @@ function expectChildren(parent, children) {
   });
 
 }
+

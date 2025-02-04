@@ -1,9 +1,16 @@
-import { Element } from '../../model/Types';
+import type { Element } from '../../model/Types';
 
-export type Token = {
-  matched: string;
-  normal: string;
+type LegacyToken = {
+  matched?: string;
+  normal?: string;
 };
+
+type ModernToken = {
+  match: boolean;
+  value: string;
+};
+
+export type Token = LegacyToken | ModernToken;
 
 export type SearchResult = {
   primaryTokens: Token[];

@@ -445,7 +445,7 @@ describe('features/copy-paste', function() {
         });
 
 
-        it('should fire <copyPaste.pasteElements> event when pasting elements', function(done) {
+        it('should fire <copyPaste.pasteElement> event when pasting elements', function(done) {
           getDiagramJS().invoke(function(copyPaste, elementFactory, eventBus) {
 
             // given
@@ -530,8 +530,6 @@ describe('features/copy-paste', function() {
             y: 350
           }
         });
-
-        console.log(parentShape.children);
 
         // then
         expect(parentShape.children).to.have.length(2);
